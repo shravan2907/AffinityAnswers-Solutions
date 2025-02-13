@@ -1,42 +1,51 @@
+# **Extracting Scheme Name and NAV from URL**
 
-Extracting Scheme Name and NAV from URL
-Problem Statement
-You were given a URL (amfiindia.com/spages/NAVAll.txt) containing mutual fund data in a semicolon-separated format (;). The goal was to extract the Scheme Name (Column 4) and Net Asset Value (Column 5) and save the output in a Tab-Separated Values (TSV) file.
+## **Overview**
+This document explains the approach taken to extract **Scheme Name** and **Net Asset Value (NAV)** from a structured text file available at `amfiindia.com/spages/NAVAll.txt`. The extracted data is saved in a **Tab-Separated Values (TSV) file** for further use.
 
-Approach
-To solve this problem, I considered the following key points:
+## **Problem Statement**
+The task requires:
+- Fetching data from a given URL.
+- Extracting only **Scheme Name (Column 4)** and **NAV (Column 5)**.
+- Removing unnecessary headers.
+- Ensuring the solution is **portable** across different Unix-like systems.
 
-Handling URL Data
-Used curl to fetch data from the URL (curl -s "$URL") to ensure minimal output clutter.
-Skipping Headers
-The first row contains headers, so it needed to be skipped.
-Extracting Specific Columns
-The data is semicolon-separated (;), so we need to extract Column 4 (Scheme Name) and Column 5 (NAV).
-Ensuring Portability
-Commands like cut behave differently in BSD/macOS vs. Linux, so I opted for awk, which is more portable and flexible.
-Final Solution (Using awk)
-sh
-Copy
-Edit
-#!/bin/bash
+## **Approach**
+To address the problem efficiently, the following considerations were made:
 
-URL="https://www.amfiindia.com/spages/NAVAll.txt"
-OUTPUT_FILE="nav_data.tsv"
+### **1️⃣ Fetching Data from URL**
+- The command-line tool `curl` is used to retrieve the content of the file from the URL.
+- The `-s` flag ensures silent execution without unnecessary logs.
 
-# Fetch data, skip header, extract Scheme Name & NAV, save as TSV
-curl -s "$URL" | awk -F';' 'NR>1 {print $4 "\t" $5}' > "$OUTPUT_FILE"
+### **2️⃣ Skipping the Header Row**
+- The first row contains column headers, which are **not needed** in the extracted output.
+- The `awk` utility is used to **skip the first row** dynamically.
 
-echo "Extracted data saved to $OUTPUT_FILE"
-Why I Chose This Approach?
-1️⃣ curl for Fetching Data
-curl -s "$URL"
-Fetches data silently (-s suppresses unnecessary output).
-Works cross-platform on Linux/macOS.
-2️⃣ awk for Text Processing
-awk -F';' 'NR>1 {print $4 "\t" $5}'
--F';' sets the delimiter to semicolon (;).
-NR>1 skips the first row (header).
-print $4 "\t" $5 extracts Scheme Name & NAV, separated by a tab (\t).
-More portable than cut, which behaves differently on BSD/macOS.
-3️⃣ TSV Format for Better Readability
-Output is stored as a TSV file (.tsv), which is better for structured data than CSV.
+### **3️⃣ Extracting Specific Fields**
+- The data in the file is separated by semicolons (`;`), requiring **a field-based extraction approach**.
+- `awk` is chosen over `cut` due to better portability between **Linux and macOS**.
+
+### **4️⃣ Formatting the Output as TSV**
+- The extracted fields are separated by a **tab (`\t`)**, making the output suitable for structured data analysis.
+- The output is saved in a `.tsv` file.
+
+## **Why This Approach?**
+| Feature                | Chosen Solution (`awk`)   | Alternative (`cut`) |
+|------------------------|-------------------------|---------------------|
+| **Field Extraction**   | ✅ Yes (via `-F';'`)    | ✅ Yes (via `-d';'`) |
+| **Skipping Header**    | ✅ Yes (`NR>1`)         | ❌ No (requires `tail`) |
+| **Cross-Platform**     | ✅ Yes (Linux & macOS)  | ❌ No (BSD `cut` differs) |
+| **Formatting (TSV)**   | ✅ Yes (`"\t"` separator) | ❌ No (`cut` lacks `--output-delimiter`) |
+
+## **Challenges & Considerations**
+- **BSD vs GNU Tool Differences**: Some Unix commands behave differently on **macOS (BSD)** and **Linux (GNU)**.
+- **Alternative Methods**: Using `sed` could work but adds unnecessary complexity.
+- **Error Handling**: The script can be extended to check **network availability** before executing.
+
+## **Possible Enhancements**
+1. **Improved Error Handling**: Adding validation to ensure that the URL is reachable before execution.
+2. **Cross-Platform Compatibility for Windows**:
+   - Using **Git Bash** with a `.bat` wrapper.
+   - Converting `.sh` to `.exe` using `shc` or PowerShell scripts.
+
+For implementation details, refer to the script file.
