@@ -18,6 +18,6 @@ This repository contains answers to three different questions, each placed in it
 
 3. **NAV to TSV Conversion**  
    - Location: `Question 3`  
-   - Description: Contains the solution for converting NAV files to TSV format. See `Question 3/README.md` for details.  
+   - Description: Contains the solution for extracting text from Website to TSV format. See `Question 3/README.md` for details.  
 
 Each subfolder contains code and a detailed explanation of the approach used to solve the respective problem.  
